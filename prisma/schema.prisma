@@ -1,0 +1,197 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = "native"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String  @id @default(uuid())
+  uid        String  @default(uuid())
+  first_name String
+  last_name  String?
+
+  email         String @unique
+  mobile_number String @unique
+
+  password String?
+  roles    UserRole[] @relation("UserRoleToUser")
+  is_admin Boolean    @default(false)
+
+  provider Provider  @default(credentials)
+
+
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  permissions         Permission[]          @relation("PermissionToUser")
+
+  UserPersonalDetails UserPersonalDetails[]
+
+  UserRole            UserRole[]
+  playlists           Playlist[]            @relation(name: "UserPlaylists")
+   kids                Kids[]                @relation(name: "Kids")
+  searches            Search[]              @relation("UserToSearch")
+
+  // change name
+  @@map("user")
+}
+
+// Personal Information
+model UserPersonalDetails {
+  id             String         @id @default(uuid())
+  userId         String
+  user           User           @relation(fields: [userId], references: [id])
+  gender         Gender? 
+  date_of_birth  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // change name
+  @@map("user_personal_details")
+}
+
+// permission group
+
+model PermissionGroup {
+  id         String       @id @default(uuid())
+  name       String       @unique
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  permission Permission[]
+
+  // change name
+  @@map("permission_group")
+}
+
+// permission 
+
+model Permission {
+  id        String          @id @default(uuid())
+  name      String          @unique
+  group_id  String
+  group     PermissionGroup @relation(fields: [group_id], references: [id])
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  roles     UserRole[]      @relation("UserRoleToPermission")
+  users     User[]          @relation("PermissionToUser")
+
+  userRoleId String?
+
+  // change name
+  @@map("permission")
+}
+
+// roles
+
+model UserRole {
+  id   String @id @default(uuid())
+  name String @unique
+
+  permissions Permission[] @relation("UserRoleToPermission")
+  users       User[]       @relation("UserRoleToUser")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+
+  // change name
+  @@map("role")
+}
+
+
+
+
+model Playlist {
+  id            Int              @id @default(autoincrement())
+  playlistName  String
+  order         Int
+  playlist_Type  PlaylistType
+  created_By     String
+  created_By_User User             @relation(name: "UserPlaylists", fields: [created_By], references: [id])
+  details       PlaylistDetail[]
+
+  @@map("playlists")
+}
+
+model PlaylistDetail {
+  id         Int      @id @default(autoincrement())
+   videoLink    String
+  title        String
+  description  String
+  thumbnailUrl String
+  order        Int
+  playlistId Int
+  playlist   Playlist @relation(fields: [playlistId], references: [id])
+  videoLikes    VideoLike[] @relation("PlaylistDetailToVideoLikes")
+
+  @@map("playlist_details")
+}
+
+model Kids {
+  id            Int    @id @default(autoincrement())
+  name          String 
+  pin           String
+  parent_Id     String
+  parent        User   @relation(name: "Kids", fields: [parent_Id], references: [id])
+  videoLikes    VideoLike[] @relation("KidsToVideoLikes")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  @@map("kids")
+}
+
+model VideoLike {
+  id          Int    @id @default(autoincrement())
+  videoId     Int
+  likeById    Int
+  video       PlaylistDetail @relation(name: "PlaylistDetailToVideoLikes", fields: [videoId], references: [id])
+  likedBy     Kids @relation(name: "KidsToVideoLikes", fields: [likeById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("video_like")
+}
+
+model Search {
+  id            Int    @id @default(autoincrement())
+  search_title  String
+  search_by     String
+  user          User   @relation(name: "UserToSearch", fields: [search_by], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  @@map("search")
+}
+
+model Inquiry {
+  id            Int    @id @default(autoincrement())
+  message_title String 
+  message_description String
+}
+
+enum PlaylistType {
+  admin
+  parent
+}
+
+enum Role {
+  user
+  admin
+}
+
+enum Provider {
+  credentials
+  google
+  facebook
+}
+
+// gender
+enum Gender {
+  male
+  female
+  other
+}
+
+

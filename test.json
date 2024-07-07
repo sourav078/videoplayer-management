@@ -1,0 +1,19 @@
+{
+  "name": "Asus Zenfone 5",
+  "specification": " <ul><li>Display: 5.0 inch</li></ul>",
+  "key_features": " <ul><li>5 inch HD Display</li></ul>",
+  "description": " <ul><li>5 inch HD Display</li></ul>",
+  "images": ["imageId1", "imageId2", "imageId3"],
+  "thumbnailId": "imageId1", 
+  "selling_price": 3300,
+  "regular_price": 3700,
+  "special_price": 3000,
+  "stock": 10,
+  "slug": "asus-zenfone-5",
+  "is_active": true,
+  "brandId": "brandId1",
+  "outlet": ["outletId1", "outletId2"],
+  "productCategory": ["categoryId1", "categoryId2"],
+  "productAttribute": ["attributeId1", "attributeId2"],
+  "unit": "piece"
+}
